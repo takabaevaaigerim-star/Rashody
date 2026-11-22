@@ -2,18 +2,23 @@
 (function () {
   "use strict";
 
-  const form = document.getElementById("expense-form");
-  const amountInput = document.getElementById("amount");
-  const categoryInput = document.getElementById("category");
-  const dateInput = document.getElementById("date");
-  const commentInput = document.getElementById("comment");
-  const errorBox = document.getElementById("error");
+  const $ = (id) => document.getElementById(id);
 
-  const list = document.getElementById("expense-list");
-  const totalBox = document.getElementById("monthly-total");
-  const emptyMessage = document.getElementById("empty-message");
+  const form = $("expense-form");
+  const amountInput = $("amount");
+  const categoryInput = $("category");
+  const dateInput = $("date");
+  const commentInput = $("comment");
+  const errorBox = $("error");
+  const list = $("expense-list");
+  const totalBox = $("monthly-total");
+  const emptyMessage = $("empty-message");
+
+  const budgetForm = $("budget-form");
+  const budgetInput = $("budget-input");
 
   const STORAGE_KEY = "rashody-expenses-v1";
+  const BUDGET_KEY = "rashody-monthly-budgets-v1";
 
   const categories = {
     "Еда": "total-food",
@@ -23,6 +28,7 @@
   };
 
   let expenses = [];
+  let budgets = {};
 
   function today() {
     const now = new Date();
@@ -32,9 +38,12 @@
     return local.toISOString().slice(0, 10);
   }
 
+  function currentMonth() {
+    return today().slice(0, 7);
+  }
+
   function money(value) {
     const safe = Number.isFinite(value) ? value : 0;
-
     return Math.round(safe)
       .toString()
       .replace(/\B(?=(\d{3})+(?!\d))/g, " ") + " ₸";
@@ -42,30 +51,26 @@
 
   function parseAmount(raw) {
     const text = String(raw).replace(/\s/g, "");
-
-    if (!/^\d+$/.test(text)) {
-      return null;
-    }
+    if (!/^\d+$/.test(text)) return null;
 
     const value = Number(text);
-
     if (!Number.isSafeInteger(value) || value <= 0) {
       return null;
     }
-
     return value;
   }
 
-  function save() {
+  function saveExpenses(nextExpenses) {
     try {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify(expenses)
+        JSON.stringify(nextExpenses)
       );
+      expenses = nextExpenses;
       return true;
     } catch (error) {
       errorBox.textContent =
-        "Не удалось сохранить данные в браузере.";
+        "Не удалось сохранить расходы в браузере.";
       return false;
     }
   }
@@ -90,23 +95,84 @@
     } catch (error) {
       expenses = [];
     }
+
+    try {
+      const savedBudgets = JSON.parse(
+        localStorage.getItem(BUDGET_KEY) || "{}"
+      );
+
+      if (
+        savedBudgets &&
+        typeof savedBudgets === "object" &&
+        !Array.isArray(savedBudgets)
+      ) {
+        budgets = savedBudgets;
+      }
+    } catch (error) {
+      budgets = {};
+    }
   }
 
   function createText(tag, text, className) {
     const element = document.createElement(tag);
     element.textContent = text;
+    if (className) element.className = className;
+    return element;
+  }
 
-    if (className) {
-      element.className = className;
+  function renderBudget(monthlyTotal) {
+    const month = currentMonth();
+    const budget = budgets[month];
+
+    if (
+      !Number.isSafeInteger(budget) ||
+      budget <= 0
+    ) {
+      $("budget-result").hidden = true;
+      return;
     }
 
-    return element;
+    $("budget-result").hidden = false;
+    budgetInput.value = String(budget);
+
+    const remaining = budget - monthlyTotal;
+    const percentage = monthlyTotal / budget * 100;
+    const displayPercent = Math.round(percentage);
+    const overBudget = remaining < 0;
+
+    $("budget-total").textContent = money(budget);
+    $("budget-spent").textContent = money(monthlyTotal);
+
+    $("remaining-label").textContent =
+      overBudget ? "Превышение бюджета" : "Осталось";
+
+    $("budget-remaining").textContent =
+      money(Math.abs(remaining));
+
+    $("budget-remaining").classList.toggle(
+      "over-budget", overBudget
+    );
+
+    $("progress-fill").classList.toggle(
+      "over-budget", overBudget
+    );
+
+    $("progress-fill").style.width =
+      Math.min(100, Math.max(0, percentage)) + "%";
+
+    $("budget-progress").setAttribute(
+      "aria-valuenow",
+      String(Math.min(100, Math.max(0, displayPercent)))
+    );
+
+    $("budget-percent").textContent =
+      displayPercent + "% бюджета использовано";
   }
 
   function render() {
     list.replaceChildren();
 
-    const month = today().slice(0, 7);
+    const month = currentMonth();
     let monthlyTotal = 0;
 
     const categoryTotals = {
@@ -140,8 +206,6 @@
         )
       );
 
-      row.appendChild(info);
-
       const right = document.createElement("div");
       right.className = "expense-right";
 
@@ -157,39 +221,31 @@
       deleteButton.type = "button";
       deleteButton.className = "delete-button";
       deleteButton.textContent = "Удалить";
+
       deleteButton.setAttribute(
         "aria-label",
         "Удалить трату " +
         expense.category + " на " + money(expense.amount)
       );
 
-      deleteButton.addEventListener("click", function () {
-        const confirmed = window.confirm(
+      deleteButton.addEventListener("click", () => {
+        if (!window.confirm(
           "Удалить эту трату на " +
           money(expense.amount) + "?"
+        )) return;
+
+        const nextExpenses = expenses.filter(
+          (item) => item.id !== expense.id
         );
 
-        if (!confirmed) return;
-
-        const index = expenses.findIndex(
-          (item) => item.id === expense.id
-        );
-
-        if (index === -1) return;
-
-        const previous = expenses.slice();
-        expenses.splice(index, 1);
-
-        if (save()) {
+        if (saveExpenses(nextExpenses)) {
           errorBox.textContent = "";
-          render();
-        } else {
-          expenses = previous;
           render();
         }
       });
 
       right.appendChild(deleteButton);
+      row.appendChild(info);
       row.appendChild(right);
       list.appendChild(row);
     });
@@ -197,16 +253,15 @@
     totalBox.textContent = money(monthlyTotal);
 
     Object.keys(categories).forEach((category) => {
-      const elementId = categories[category];
-
-      document.getElementById(elementId).textContent =
+      $(categories[category]).textContent =
         money(categoryTotals[category]);
     });
 
     emptyMessage.hidden = expenses.length > 0;
+    renderBudget(monthlyTotal);
   }
 
-  form.addEventListener("submit", function (event) {
+  form.addEventListener("submit", (event) => {
     event.preventDefault();
 
     const amount = parseAmount(amountInput.value);
@@ -227,32 +282,58 @@
       return;
     }
 
+    const nextExpenses = [
+      {
+        id: Date.now() + "-" + Math.random(),
+        amount,
+        category: categoryInput.value,
+        date: dateInput.value,
+        comment: commentInput.value.trim()
+      },
+      ...expenses
+    ];
+
+    if (!saveExpenses(nextExpenses)) return;
+
     errorBox.textContent = "";
-
-    const previous = expenses.slice();
-
-    expenses.unshift({
-      id: Date.now() + "-" + Math.random(),
-      amount: amount,
-      category: categoryInput.value,
-      date: dateInput.value,
-      comment: commentInput.value.trim()
-    });
-
-    if (!save()) {
-      expenses = previous;
-      return;
-    }
-
     render();
-
     amountInput.value = "";
     commentInput.value = "";
     amountInput.focus();
   });
 
-  dateInput.value = today();
+  budgetForm.addEventListener("submit", (event) => {
+    event.preventDefault();
 
+    const amount = parseAmount(budgetInput.value);
+
+    if (amount === null) {
+      $("budget-error").textContent =
+        "Введите положительный бюджет в целых тенге";
+      return;
+    }
+
+    const nextBudgets = {
+      ...budgets,
+      [currentMonth()]: amount
+    };
+
+    try {
+      localStorage.setItem(
+        BUDGET_KEY,
+        JSON.stringify(nextBudgets)
+      );
+
+      budgets = nextBudgets;
+      $("budget-error").textContent = "";
+      render();
+    } catch (error) {
+      $("budget-error").textContent =
+        "Не удалось сохранить бюджет.";
+    }
+  });
+
+  dateInput.value = today();
   load();
   render();
 })();

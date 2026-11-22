@@ -11,12 +11,11 @@
   <main class="container">
     <header>
       <h1>Учёт расходов</h1>
-      <p>Записывайте траты и контролируйте расходы за месяц.</p>
+      <p>Записывайте траты и контролируйте бюджет.</p>
     </header>
 
     <section class="card">
       <h2>Добавить трату</h2>
-
       <form id="expense-form">
         <label>
           Сумма, ₸
@@ -47,9 +46,50 @@
         </label>
 
         <p id="error" role="alert"></p>
-
         <button type="submit">Добавить трату</button>
       </form>
+    </section>
+
+    <section class="card budget-card">
+      <h2>Мой бюджет на месяц</h2>
+      <form id="budget-form">
+        <label>
+          Установить бюджет, ₸
+          <input id="budget-input" type="text"
+                 inputmode="numeric"
+                 placeholder="Например: 150000">
+        </label>
+        <p id="budget-error" role="alert"></p>
+        <button type="submit">Сохранить бюджет</button>
+      </form>
+
+      <div id="budget-result" hidden>
+        <div class="budget-line">
+          <span>Бюджет</span>
+          <strong id="budget-total">0 ₸</strong>
+        </div>
+        <div class="budget-line">
+          <span>Потрачено</span>
+          <strong id="budget-spent">0 ₸</strong>
+        </div>
+
+        <div class="progress-track"
+             role="progressbar"
+             aria-label="Использовано бюджета"
+             aria-valuemin="0"
+             aria-valuemax="100"
+             aria-valuenow="0"
+             id="budget-progress">
+          <div id="progress-fill"></div>
+        </div>
+
+        <p id="budget-percent"></p>
+
+        <div class="budget-line remaining">
+          <span id="remaining-label">Осталось</span>
+          <strong id="budget-remaining">0 ₸</strong>
+        </div>
+      </div>
     </section>
 
     <section class="card summary">
@@ -59,24 +99,11 @@
 
     <section class="card">
       <h2>Расходы по категориям</h2>
-
       <div id="category-totals">
-        <p>
-          <span>Еда</span>
-          <strong id="total-food">0 ₸</strong>
-        </p>
-        <p>
-          <span>Транспорт</span>
-          <strong id="total-transport">0 ₸</strong>
-        </p>
-        <p>
-          <span>Дом</span>
-          <strong id="total-home">0 ₸</strong>
-        </p>
-        <p>
-          <span>Другое</span>
-          <strong id="total-other">0 ₸</strong>
-        </p>
+        <p><span>Еда</span><strong id="total-food">0 ₸</strong></p>
+        <p><span>Транспорт</span><strong id="total-transport">0 ₸</strong></p>
+        <p><span>Дом</span><strong id="total-home">0 ₸</strong></p>
+        <p><span>Другое</span><strong id="total-other">0 ₸</strong></p>
       </div>
     </section>
 
@@ -86,7 +113,6 @@
       <p id="empty-message">Пока нет расходов.</p>
     </section>
   </main>
-
   <script src="script.js"></script>
 </body>
 </html>
