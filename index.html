@@ -20,18 +20,21 @@
       <form id="expense-form">
         <label>
           Сумма, ₸
-          <input id="amount" type="text"
-                 inputmode="numeric"
-                 placeholder="Например: 5000">
+          <input
+            id="amount"
+            type="text"
+            inputmode="numeric"
+            placeholder="Например: 5000"
+          >
         </label>
 
         <label>
           Категория
           <select id="category">
-            <option>Еда</option>
-            <option>Транспорт</option>
-            <option>Дом</option>
-            <option>Другое</option>
+            <option value="Еда">Еда</option>
+            <option value="Транспорт">Транспорт</option>
+            <option value="Дом">Дом</option>
+            <option value="Другое">Другое</option>
           </select>
         </label>
 
@@ -42,8 +45,11 @@
 
         <label>
           Комментарий
-          <input id="comment" type="text"
-                 placeholder="Необязательно">
+          <input
+            id="comment"
+            type="text"
+            placeholder="Необязательно"
+          >
         </label>
 
         <p id="error" role="alert"></p>
@@ -58,11 +64,35 @@
     </section>
 
     <section class="card">
+      <h2>Расходы по категориям</h2>
+
+      <div id="category-totals">
+        <p>
+          <span>Еда</span>
+          <strong id="total-food">0 ₸</strong>
+        </p>
+
+        <p>
+          <span>Транспорт</span>
+          <strong id="total-transport">0 ₸</strong>
+        </p>
+
+        <p>
+          <span>Дом</span>
+          <strong id="total-home">0 ₸</strong>
+        </p>
+
+        <p>
+          <span>Другое</span>
+          <strong id="total-other">0 ₸</strong>
+        </p>
+      </div>
+    </section>
+
+    <section class="card">
       <h2>История расходов</h2>
       <div id="expense-list"></div>
-      <p id="empty-message">
-        Пока нет расходов.
-      </p>
+      <p id="empty-message">Пока нет расходов.</p>
     </section>
   </main>
 
