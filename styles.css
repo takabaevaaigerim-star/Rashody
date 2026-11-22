@@ -79,6 +79,13 @@ button:hover {
   background: #125b46;
 }
 
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #19765c;
+  outline-offset: 2px;
+}
+
 #error {
   color: #c62828;
   margin: 0;
@@ -98,8 +105,6 @@ button:hover {
   color: #19765c;
   margin-bottom: 0;
 }
-
-/* Функция 2: итоги по категориям */
 
 #category-totals {
   display: grid;
@@ -125,11 +130,10 @@ button:hover {
   white-space: nowrap;
 }
 
-/* История расходов */
-
 .expense {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
   padding: 15px 0;
   border-bottom: 1px solid #e5eaed;
@@ -143,6 +147,14 @@ button:hover {
   overflow-wrap: anywhere;
 }
 
+.expense-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .expense-amount {
   font-weight: bold;
   white-space: nowrap;
@@ -150,6 +162,20 @@ button:hover {
 
 .expense small {
   color: #68757d;
+}
+
+/* Функция 3: удаление расходов */
+
+.delete-button {
+  background: #fff0f0;
+  color: #b42323;
+  border: 1px solid #f1c4c4;
+  padding: 10px 14px;
+  border-radius: 8px;
+}
+
+.delete-button:hover {
+  background: #fbdada;
 }
 
 #empty-message {
@@ -175,5 +201,14 @@ button:hover {
 
   .expense {
     flex-wrap: wrap;
+  }
+
+  .expense-right {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .delete-button {
+    min-height: 44px;
   }
 }

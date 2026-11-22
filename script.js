@@ -29,7 +29,6 @@
     const local = new Date(
       now.getTime() - now.getTimezoneOffset() * 60000
     );
-
     return local.toISOString().slice(0, 10);
   }
 
@@ -50,10 +49,7 @@
 
     const value = Number(text);
 
-    if (
-      !Number.isSafeInteger(value) ||
-      value <= 0
-    ) {
+    if (!Number.isSafeInteger(value) || value <= 0) {
       return null;
     }
 
@@ -66,9 +62,11 @@
         STORAGE_KEY,
         JSON.stringify(expenses)
       );
+      return true;
     } catch (error) {
       errorBox.textContent =
         "Не удалось сохранить данные в браузере.";
+      return false;
     }
   }
 
@@ -119,7 +117,6 @@
     };
 
     expenses.forEach((expense) => {
-      // Учитываем только текущий месяц.
       if (expense.date.slice(0, 7) === month) {
         monthlyTotal += expense.amount;
         categoryTotals[expense.category] += expense.amount;
@@ -145,7 +142,10 @@
 
       row.appendChild(info);
 
-      row.appendChild(
+      const right = document.createElement("div");
+      right.className = "expense-right";
+
+      right.appendChild(
         createText(
           "span",
           money(expense.amount),
@@ -153,13 +153,49 @@
         )
       );
 
+      const deleteButton = document.createElement("button");
+      deleteButton.type = "button";
+      deleteButton.className = "delete-button";
+      deleteButton.textContent = "Удалить";
+      deleteButton.setAttribute(
+        "aria-label",
+        "Удалить трату " +
+        expense.category + " на " + money(expense.amount)
+      );
+
+      deleteButton.addEventListener("click", function () {
+        const confirmed = window.confirm(
+          "Удалить эту трату на " +
+          money(expense.amount) + "?"
+        );
+
+        if (!confirmed) return;
+
+        const index = expenses.findIndex(
+          (item) => item.id === expense.id
+        );
+
+        if (index === -1) return;
+
+        const previous = expenses.slice();
+        expenses.splice(index, 1);
+
+        if (save()) {
+          errorBox.textContent = "";
+          render();
+        } else {
+          expenses = previous;
+          render();
+        }
+      });
+
+      right.appendChild(deleteButton);
+      row.appendChild(right);
       list.appendChild(row);
     });
 
-    // Общий итог.
     totalBox.textContent = money(monthlyTotal);
 
-    // Итоги по категориям.
     Object.keys(categories).forEach((category) => {
       const elementId = categories[category];
 
@@ -193,6 +229,8 @@
 
     errorBox.textContent = "";
 
+    const previous = expenses.slice();
+
     expenses.unshift({
       id: Date.now() + "-" + Math.random(),
       amount: amount,
@@ -201,7 +239,11 @@
       comment: commentInput.value.trim()
     });
 
-    save();
+    if (!save()) {
+      expenses = previous;
+      return;
+    }
+
     render();
 
     amountInput.value = "";
