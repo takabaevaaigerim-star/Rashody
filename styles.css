@@ -1,0 +1,148 @@
+
+* {
+    box-sizing: border-box;
+  }
+  
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f4f6f8;
+    color: #263238;
+  }
+  
+  .container {
+    max-width: 800px;
+    margin: auto;
+    padding: 30px 16px;
+  }
+  
+  header {
+    margin-bottom: 25px;
+  }
+  
+  h1 {
+    font-size: 30px;
+    margin-bottom: 8px;
+  }
+  
+  header p {
+    color: #68757d;
+  }
+  
+  .card {
+    background: white;
+    padding: 24px;
+    border-radius: 14px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 15px rgba(0,0,0,0.05);
+  }
+  
+  h2 {
+    margin-top: 0;
+    font-size: 20px;
+  }
+  
+  form {
+    display: grid;
+    gap: 16px;
+  }
+  
+  label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-weight: 600;
+  }
+  
+  input,
+  select {
+    width: 100%;
+    min-height: 44px;
+    padding: 12px;
+    border: 1px solid #d8e0e5;
+    border-radius: 8px;
+    font-size: 16px;
+  }
+  
+  button {
+    min-height: 44px;
+    padding: 12px;
+    background: #19765c;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  button:hover {
+    background: #125b46;
+  }
+  
+  #error {
+    color: #c62828;
+    margin: 0;
+  }
+  
+  #error:empty {
+    display: none;
+  }
+  
+  .summary {
+    background: #e8f5ef;
+  }
+  
+  #monthly-total {
+    font-size: 32px;
+    font-weight: bold;
+    color: #19765c;
+    margin-bottom: 0;
+  }
+  
+  .expense {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 15px 0;
+    border-bottom: 1px solid #e5eaed;
+  }
+  
+  .expense-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  
+  .expense-amount {
+    font-weight: bold;
+    white-space: nowrap;
+  }
+  
+  .expense small {
+    color: #68757d;
+  }
+  
+  #empty-message {
+    color: #68757d;
+  }
+  
+  @media (max-width: 375px) {
+    .container {
+      padding: 16px 10px;
+    }
+  
+    .card {
+      padding: 16px;
+    }
+  
+    h1 {
+      font-size: 26px;
+    }
+  
+    .expense {
+      flex-wrap: wrap;
+    }
+  }
+  
