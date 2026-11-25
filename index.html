@@ -39,7 +39,6 @@
                  inputmode="numeric"
                  placeholder="Например: 5000">
         </label>
-
         <label>
           Категория
           <select id="category">
@@ -49,18 +48,15 @@
             <option value="Другое">Другое</option>
           </select>
         </label>
-
         <label>
           Дата
           <input id="date" type="date">
         </label>
-
         <label>
           Комментарий
           <input id="comment" type="text"
                  placeholder="Например: продукты">
         </label>
-
         <p id="error" role="alert"></p>
         <button type="submit">Добавить трату</button>
       </form>
@@ -88,7 +84,6 @@
           <span>Потрачено</span>
           <strong id="budget-spent">0 ₸</strong>
         </div>
-
         <div class="progress-track"
              role="progressbar"
              aria-label="Использовано бюджета"
@@ -98,9 +93,7 @@
              id="budget-progress">
           <div id="progress-fill"></div>
         </div>
-
         <p id="budget-percent"></p>
-
         <div class="budget-line remaining">
           <span id="remaining-label">Осталось</span>
           <strong id="budget-remaining">0 ₸</strong>
@@ -108,7 +101,6 @@
       </div>
     </section>
 
-    <!-- Урок 10: шаг 1 — лимиты категорий -->
     <section class="card">
       <h2>Лимиты по категориям</h2>
       <p class="section-hint">
@@ -122,21 +114,18 @@
                  inputmode="numeric"
                  placeholder="Например: 15000">
         </label>
-
         <label>
           Транспорт, ₸
           <input id="limit-transport" type="text"
                  inputmode="numeric"
                  placeholder="Например: 5000">
         </label>
-
         <label>
           Дом, ₸
           <input id="limit-home" type="text"
                  inputmode="numeric"
                  placeholder="Например: 20000">
         </label>
-
         <label>
           Другое, ₸
           <input id="limit-other" type="text"
@@ -147,6 +136,12 @@
         <p id="category-limit-error" role="alert"></p>
         <button type="submit">Сохранить лимиты</button>
       </form>
+
+      <!-- Урок 10: Шаг 2 -->
+      <div id="category-budget-details" class="category-budget-details">
+        <h3>Остатки по категориям</h3>
+        <div id="category-budget-list"></div>
+      </div>
     </section>
 
     <section class="card summary">

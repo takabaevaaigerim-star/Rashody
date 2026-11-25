@@ -42,6 +42,10 @@ h2 {
   font-size: 20px;
 }
 
+h3 {
+  font-size: 18px;
+}
+
 form {
   display: grid;
   gap: 16px;
@@ -87,13 +91,15 @@ select:focus-visible {
 }
 
 #error,
-#budget-error {
+#budget-error,
+#category-limit-error {
   color: #c62828;
   margin: 0;
 }
 
 #error:empty,
-#budget-error:empty {
+#budget-error:empty,
+#category-limit-error:empty {
   display: none;
 }
 
@@ -181,8 +187,6 @@ select:focus-visible {
   display: none !important;
 }
 
-/* Дополнительная функция: месячный бюджет */
-
 .budget-card {
   border: 1px solid #d7e6dc;
 }
@@ -269,23 +273,49 @@ select:focus-visible {
   }
 }
 
-/* Урок 10 — шаг 1: лимиты по категориям */
-
 .section-hint {
   color: #68757d;
   margin-bottom: 20px;
 }
 
-#category-limit-error {
-  color: #c62828;
-  margin: 0;
-}
-
-#category-limit-error:empty {
-  display: none;
-}
-
 #category-limit-form {
   display: grid;
   gap: 16px;
+}
+
+/* Урок 10 — шаг 2: остатки по категориям */
+
+.category-budget-details {
+  margin-top: 28px;
+  border-top: 1px solid #e5eaed;
+  padding-top: 16px;
+}
+
+#category-budget-list {
+  display: grid;
+  gap: 14px;
+}
+
+.category-budget-item {
+  padding: 16px;
+  background: #f7faf8;
+  border: 1px solid #e2eae5;
+  border-radius: 10px;
+}
+
+.category-budget-item h4 {
+  margin: 0 0 12px;
+  font-size: 16px;
+}
+
+.category-budget-item p {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 8px 0;
+}
+
+.category-budget-item strong {
+  text-align: right;
+  overflow-wrap: anywhere;
 }

@@ -148,7 +148,6 @@
     return element;
   }
 
-  // Шаг 1: загружаем лимиты текущего месяца в поля.
   function renderCategoryLimits() {
     if (!categoryLimitForm) return;
 
@@ -162,6 +161,65 @@
         Number.isSafeInteger(value) && value > 0
           ? String(value)
           : "";
+    });
+  }
+
+  // Урок 10 — шаг 2: остатки по категориям.
+  function renderCategoryBudgetDetails(categoryTotals) {
+    const container = $("category-budget-list");
+    if (!container) return;
+
+    container.replaceChildren();
+
+    const limits = categoryLimits[currentMonth()] || {};
+
+    Object.keys(categories).forEach((category) => {
+      const spent = categoryTotals[category] || 0;
+      const limit = limits[category];
+      const hasLimit =
+        Number.isSafeInteger(limit) && limit > 0;
+
+      const card = document.createElement("div");
+      card.className = "category-budget-item";
+
+      card.appendChild(
+        createText("h4", category)
+      );
+
+      const limitLine = document.createElement("p");
+      limitLine.appendChild(
+        createText("span", "Лимит")
+      );
+      limitLine.appendChild(
+        createText(
+          "strong",
+          hasLimit ? money(limit) : "Не установлен"
+        )
+      );
+      card.appendChild(limitLine);
+
+      const spentLine = document.createElement("p");
+      spentLine.appendChild(
+        createText("span", "Потрачено")
+      );
+      spentLine.appendChild(
+        createText("strong", money(spent))
+      );
+      card.appendChild(spentLine);
+
+      const remainingLine = document.createElement("p");
+      remainingLine.appendChild(
+        createText("span", "Осталось")
+      );
+      remainingLine.appendChild(
+        createText(
+          "strong",
+          hasLimit ? money(limit - spent) : "—"
+        )
+      );
+      card.appendChild(remainingLine);
+
+      container.appendChild(card);
     });
   }
 
@@ -303,7 +361,9 @@
     });
 
     emptyMessage.hidden = expenses.length > 0;
+
     renderBudget(monthlyTotal);
+    renderCategoryBudgetDetails(categoryTotals);
   }
 
   form.addEventListener("submit", (event) => {
@@ -378,7 +438,6 @@
     }
   });
 
-  // Шаг 1: сохраняем лимиты категорий.
   if (categoryLimitForm) {
     categoryLimitForm.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -404,7 +463,6 @@
         }
       });
 
-      // Не сохраняем 0, отрицательные и неверные значения.
       for (const category of Object.keys(categoryLimitFields)) {
         const raw = $(categoryLimitFields[category]).value.trim();
 
@@ -429,6 +487,7 @@
         categoryLimits = nextCategoryLimits;
         categoryLimitError.textContent = "";
         renderCategoryLimits();
+        render();
       } catch (error) {
         categoryLimitError.textContent =
           "Не удалось сохранить лимиты.";
