@@ -268,3 +268,24 @@ select:focus-visible {
     flex-wrap: wrap;
   }
 }
+
+/* Урок 10 — шаг 1: лимиты по категориям */
+
+.section-hint {
+  color: #68757d;
+  margin-bottom: 20px;
+}
+
+#category-limit-error {
+  color: #c62828;
+  margin: 0;
+}
+
+#category-limit-error:empty {
+  display: none;
+}
+
+#category-limit-form {
+  display: grid;
+  gap: 16px;
+}

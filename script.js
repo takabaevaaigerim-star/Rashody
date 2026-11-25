@@ -17,8 +17,12 @@
   const budgetForm = $("budget-form");
   const budgetInput = $("budget-input");
 
+  const categoryLimitForm = $("category-limit-form");
+  const categoryLimitError = $("category-limit-error");
+
   const STORAGE_KEY = "rashody-expenses-v1";
   const BUDGET_KEY = "rashody-monthly-budgets-v1";
+  const CATEGORY_LIMIT_KEY = "rashody-category-limits-v1";
 
   const categories = {
     "Еда": "total-food",
@@ -27,8 +31,16 @@
     "Другое": "total-other"
   };
 
+  const categoryLimitFields = {
+    "Еда": "limit-food",
+    "Транспорт": "limit-transport",
+    "Дом": "limit-home",
+    "Другое": "limit-other"
+  };
+
   let expenses = [];
   let budgets = {};
+  let categoryLimits = {};
 
   function today() {
     const now = new Date();
@@ -111,6 +123,22 @@
     } catch (error) {
       budgets = {};
     }
+
+    try {
+      const savedLimits = JSON.parse(
+        localStorage.getItem(CATEGORY_LIMIT_KEY) || "{}"
+      );
+
+      if (
+        savedLimits &&
+        typeof savedLimits === "object" &&
+        !Array.isArray(savedLimits)
+      ) {
+        categoryLimits = savedLimits;
+      }
+    } catch (error) {
+      categoryLimits = {};
+    }
   }
 
   function createText(tag, text, className) {
@@ -118,6 +146,23 @@
     element.textContent = text;
     if (className) element.className = className;
     return element;
+  }
+
+  // Шаг 1: загружаем лимиты текущего месяца в поля.
+  function renderCategoryLimits() {
+    if (!categoryLimitForm) return;
+
+    const limits = categoryLimits[currentMonth()] || {};
+
+    Object.keys(categoryLimitFields).forEach((category) => {
+      const field = $(categoryLimitFields[category]);
+      const value = limits[category];
+
+      field.value =
+        Number.isSafeInteger(value) && value > 0
+          ? String(value)
+          : "";
+    });
   }
 
   function renderBudget(monthlyTotal) {
@@ -333,7 +378,66 @@
     }
   });
 
+  // Шаг 1: сохраняем лимиты категорий.
+  if (categoryLimitForm) {
+    categoryLimitForm.addEventListener("submit", (event) => {
+      event.preventDefault();
+
+      const nextLimits = {};
+      const currentLimits =
+        categoryLimits[currentMonth()] || {};
+
+      Object.keys(categoryLimitFields).forEach((category) => {
+        const raw = $(categoryLimitFields[category]).value.trim();
+
+        if (raw === "") {
+          if (Number.isSafeInteger(currentLimits[category])) {
+            nextLimits[category] = currentLimits[category];
+          }
+          return;
+        }
+
+        const value = parseAmount(raw);
+
+        if (value !== null) {
+          nextLimits[category] = value;
+        }
+      });
+
+      // Не сохраняем 0, отрицательные и неверные значения.
+      for (const category of Object.keys(categoryLimitFields)) {
+        const raw = $(categoryLimitFields[category]).value.trim();
+
+        if (raw !== "" && parseAmount(raw) === null) {
+          categoryLimitError.textContent =
+            "Лимит должен быть положительным целым числом.";
+          return;
+        }
+      }
+
+      const nextCategoryLimits = {
+        ...categoryLimits,
+        [currentMonth()]: nextLimits
+      };
+
+      try {
+        localStorage.setItem(
+          CATEGORY_LIMIT_KEY,
+          JSON.stringify(nextCategoryLimits)
+        );
+
+        categoryLimits = nextCategoryLimits;
+        categoryLimitError.textContent = "";
+        renderCategoryLimits();
+      } catch (error) {
+        categoryLimitError.textContent =
+          "Не удалось сохранить лимиты.";
+      }
+    });
+  }
+
   dateInput.value = today();
   load();
+  renderCategoryLimits();
   render();
 })();
