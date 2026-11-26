@@ -283,7 +283,7 @@ select:focus-visible {
   gap: 16px;
 }
 
-/* Урок 10 — шаг 2: остатки по категориям */
+/* Остатки по категориям */
 
 .category-budget-details {
   margin-top: 28px;
@@ -318,4 +318,30 @@ select:focus-visible {
 .category-budget-item strong {
   text-align: right;
   overflow-wrap: anywhere;
+}
+
+/* Урок 10 — шаг 3: индикаторы категорий */
+
+.category-progress {
+  width: 100%;
+  height: 10px;
+  margin-top: 14px;
+  background: #e3ebe6;
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.category-progress-fill {
+  height: 100%;
+  width: 0;
+  background: #19765c;
+  border-radius: 20px;
+  transition: width 0.2s ease;
+}
+
+.category-progress-caption {
+  display: block;
+  margin-top: 8px;
+  color: #68757d;
+  font-size: 13px;
 }

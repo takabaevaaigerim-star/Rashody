@@ -16,7 +16,6 @@
 
   const budgetForm = $("budget-form");
   const budgetInput = $("budget-input");
-
   const categoryLimitForm = $("category-limit-form");
   const categoryLimitError = $("category-limit-error");
 
@@ -164,7 +163,8 @@
     });
   }
 
-  // Урок 10 — шаг 2: остатки по категориям.
+  // Урок 10 — шаги 2 и 3:
+  // остатки и индикаторы использования лимитов.
   function renderCategoryBudgetDetails(categoryTotals) {
     const container = $("category-budget-list");
     if (!container) return;
@@ -182,14 +182,10 @@
       const card = document.createElement("div");
       card.className = "category-budget-item";
 
-      card.appendChild(
-        createText("h4", category)
-      );
+      card.appendChild(createText("h4", category));
 
       const limitLine = document.createElement("p");
-      limitLine.appendChild(
-        createText("span", "Лимит")
-      );
+      limitLine.appendChild(createText("span", "Лимит"));
       limitLine.appendChild(
         createText(
           "strong",
@@ -199,18 +195,14 @@
       card.appendChild(limitLine);
 
       const spentLine = document.createElement("p");
-      spentLine.appendChild(
-        createText("span", "Потрачено")
-      );
+      spentLine.appendChild(createText("span", "Потрачено"));
       spentLine.appendChild(
         createText("strong", money(spent))
       );
       card.appendChild(spentLine);
 
       const remainingLine = document.createElement("p");
-      remainingLine.appendChild(
-        createText("span", "Осталось")
-      );
+      remainingLine.appendChild(createText("span", "Осталось"));
       remainingLine.appendChild(
         createText(
           "strong",
@@ -218,6 +210,45 @@
         )
       );
       card.appendChild(remainingLine);
+
+      // Шаг 3: индикатор для категорий с лимитом.
+      if (hasLimit) {
+        const percentage = spent / limit * 100;
+        const safePercentage = Number.isFinite(percentage)
+          ? Math.max(0, percentage)
+          : 0;
+
+        const progress = document.createElement("div");
+        progress.className = "category-progress";
+        progress.setAttribute("role", "progressbar");
+        progress.setAttribute(
+          "aria-label",
+          "Использовано лимита: " + category
+        );
+        progress.setAttribute("aria-valuemin", "0");
+        progress.setAttribute("aria-valuemax", "100");
+        progress.setAttribute(
+          "aria-valuenow",
+          String(Math.min(100, Math.round(safePercentage)))
+        );
+
+        const fill = document.createElement("div");
+        fill.className = "category-progress-fill";
+        fill.style.width =
+          Math.min(100, safePercentage) + "%";
+
+        progress.appendChild(fill);
+        card.appendChild(progress);
+
+        card.appendChild(
+          createText(
+            "small",
+            Math.round(safePercentage) +
+              "% лимита использовано",
+            "category-progress-caption"
+          )
+        );
+      }
 
       container.appendChild(card);
     });
