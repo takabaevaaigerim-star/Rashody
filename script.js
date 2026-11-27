@@ -163,8 +163,7 @@
     });
   }
 
-  // Урок 10 — шаги 2 и 3:
-  // остатки и индикаторы использования лимитов.
+  // Урок 10: лимиты, остатки, индикаторы, перерасход.
   function renderCategoryBudgetDetails(categoryTotals) {
     const container = $("category-budget-list");
     if (!container) return;
@@ -178,9 +177,14 @@
       const limit = limits[category];
       const hasLimit =
         Number.isSafeInteger(limit) && limit > 0;
+      const overBudget = hasLimit && spent > limit;
 
       const card = document.createElement("div");
       card.className = "category-budget-item";
+
+      if (overBudget) {
+        card.classList.add("category-over-budget");
+      }
 
       card.appendChild(createText("h4", category));
 
@@ -202,7 +206,9 @@
       card.appendChild(spentLine);
 
       const remainingLine = document.createElement("p");
-      remainingLine.appendChild(createText("span", "Осталось"));
+      remainingLine.appendChild(
+        createText("span", "Осталось")
+      );
       remainingLine.appendChild(
         createText(
           "strong",
@@ -211,7 +217,6 @@
       );
       card.appendChild(remainingLine);
 
-      // Шаг 3: индикатор для категорий с лимитом.
       if (hasLimit) {
         const percentage = spent / limit * 100;
         const safePercentage = Number.isFinite(percentage)
@@ -237,6 +242,10 @@
         fill.style.width =
           Math.min(100, safePercentage) + "%";
 
+        if (overBudget) {
+          fill.classList.add("over-budget");
+        }
+
         progress.appendChild(fill);
         card.appendChild(progress);
 
@@ -248,6 +257,18 @@
             "category-progress-caption"
           )
         );
+      }
+
+      // Шаг 4: предупреждение о перерасходе.
+      if (overBudget) {
+        const warning = createText(
+          "p",
+          "Лимит превышен на " + money(spent - limit),
+          "category-warning"
+        );
+
+        warning.setAttribute("role", "status");
+        card.appendChild(warning);
       }
 
       container.appendChild(card);
