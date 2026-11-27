@@ -1,5 +1,5 @@
 
-const CACHE_NAME = "rashody-pwa-v1";
+const CACHE_NAME = "rashody-pwa-v2";
 
 const FILES = [
   "./",
@@ -25,7 +25,8 @@ self.addEventListener("activate", (event) => {
     caches.keys().then(async (keys) => {
       await Promise.all(
         keys
-          .filter((key) => key !== CACHE_NAME)
+          .filter((key) => key.startsWith("rashody-pwa-")
+            && key !== CACHE_NAME)
           .map((key) => caches.delete(key))
       );
       await self.clients.claim();
